@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Natural Gas Futures Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Daily Natural Gas Futures Data</h1>
+    <p>Data retrieved from the EIA API using the GET method with an API key.</p>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        const API_URL = 'https://api.eia.gov/v2/natural-gas/pri/fut/data/?api_key=BRUFz1Ow7Qmcd2npz5UNQhrF4ILujETSWc5L3mBC&frequency=daily&data[0]=value&sort[0][column]=period&sort[0][direction]=desc&offset=0&length=5000';
+        
+        async function fetchData() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'GET', // Explicitly using the GET method
+                });
+                if (!response.ok) {
+                    throw new Error(`Error fetching data: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                populateTable(data.response.data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function populateTable(data) {
+            const tableBody = document.getElementById('data-table').querySelector('tbody');
+            tableBody.innerHTML = ''; // Clear any existing data
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                const dateCell = document.createElement('td');
+                const valueCell = document.createElement('td');
+
+                dateCell.textContent = item.period;
+                valueCell.textContent = item.value;
+
+                row.appendChild(dateCell);
+                row.appendChild(valueCell);
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Fetch and display data on page load
+        fetchData();
+    </script>
+</body>
+</html>
